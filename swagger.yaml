@@ -1,0 +1,249 @@
+openapi: 3.0.0
+info:
+  title: E-commerce API
+  version: 1.0.0
+  description: API for managing products and user shopping carts in an e-commerce application
+
+servers:
+  - url: http://localhost:3000/api
+
+paths:
+  /api-docs:
+    get:
+      summary: API Documentation
+      security:
+        - basicAuth: [ ]
+      responses:
+        '200':
+          description: Successful response
+        '401':
+          description: Unauthorized
+  /products:
+    get:
+      summary: Get all products or a specific product
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: string
+          description: ID of the product to retrieve (optional)
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Product'
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+        '404':
+          description: Product not found
+        '500':
+          description: Internal Server Error
+
+    post:
+      summary: Add new product(s)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/Product'
+                - type: array
+                  items:
+                    $ref: '#/components/schemas/Product'
+      responses:
+        '201':
+          description: Product(s) added successfully
+        '500':
+          description: Internal Server Error
+
+    delete:
+      summary: Delete a product
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the product to delete
+      responses:
+        '200':
+          description: Product deleted successfully
+        '400':
+          description: Product ID is required
+        '404':
+          description: Product not found
+        '500':
+          description: Internal Server Error
+
+    put:
+      summary: Update a product
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID of the product to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductUpdate'
+      responses:
+        '200':
+          description: Product updated successfully
+        '400':
+          description: Product ID is required
+        '404':
+          description: Product not found
+        '500':
+          description: Internal Server Error
+
+  /user/{userId}/cart:
+    get:
+      summary: Get user's cart
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '404':
+          description: User not found
+        '500':
+          description: Server error
+
+    post:
+      summary: Add product(s) to cart
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/SingleProductAdd'
+                - $ref: '#/components/schemas/MultipleProductAdd'
+      responses:
+        '201':
+          description: Products added successfully
+        '207':
+          description: Some products were not found
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+
+    delete:
+      summary: Remove product(s) from cart
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/SingleProductRemove'
+                - $ref: '#/components/schemas/MultipleProductRemove'
+      responses:
+        '200':
+          description: Products removed successfully
+        '207':
+          description: Some products were not found in the cart
+        '400':
+          description: Invalid input
+        '404':
+          description: User not found
+        '500':
+          description: Server error
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    Product:
+      type: object
+      required:
+        - id
+        - name
+        - imageUrl
+        - description
+        - price
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        imageUrl:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+
+    ProductUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        imageUrl:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+
+    SingleProductAdd:
+      type: object
+      properties:
+        productId:
+          type: string
+
+    MultipleProductAdd:
+      type: object
+      properties:
+        productIds:
+          type: array
+          items:
+            type: string
+
+    SingleProductRemove:
+      type: object
+      properties:
+        productId:
+          type: string
+
+    MultipleProductRemove:
+      type: object
+      properties:
+        productIds:
+          type: array
+          items:
+            type: string
