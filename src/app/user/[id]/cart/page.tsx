@@ -6,7 +6,7 @@ import ClientCartWrapper from "@/app/user/[id]/cart/ClientCartWrapper";
 export const dynamic='force-dynamic';
 
 async function fetchCartItems(userId: string): Promise<Product[]> {
-    const response = await fetch(process.env.NEXT_PUBLIC_SITE_URL +`/api/user/${userId}/cart`);
+    const response = await fetch(`/api/user/${userId}/cart`);
     if (!response.ok) {
         throw new Error('Failed to fetch cart items');
     }

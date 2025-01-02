@@ -21,7 +21,7 @@ const ClientCartWrapper = ({initialCartProducts, userId}: { initialCartProducts:
     useEffect(() => {
         const fetchCartItems = async () => {
             try {
-                const response = await fetch(process.env.NEXT_PUBLIC_SITE_URL+`/api/user/${userId}/cart`);
+                const response = await fetch(`/api/user/${userId}/cart`);
                 if (!response.ok) {
                     console.error('Failed to fetch cart items');
                     return;
@@ -36,7 +36,7 @@ const ClientCartWrapper = ({initialCartProducts, userId}: { initialCartProducts:
                 }
             } catch (error) {
                 console.error("Error fetching cart items:", error);
-                clearCartAndRedirect();
+                //clearCartAndRedirect();
                 // Handle error (e.g., show error message)
             }
         };
@@ -57,7 +57,7 @@ const ClientCartWrapper = ({initialCartProducts, userId}: { initialCartProducts:
 
                 // Fetch the full details of the remaining products
                 const fullUpdatedCart = await Promise.all(updatedCart.map(async (item: Product) => {
-                    const productResponse = await fetch(process.env.NEXT_PUBLIC_SITE_URL+`/api/products/${item.id}`);
+                    const productResponse = await fetch(`/api/products/${item.id}`);
                     if (productResponse.ok) {
                         return await productResponse.json();
                     }
