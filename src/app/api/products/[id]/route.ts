@@ -1,6 +1,6 @@
 // create a GET method for localhost:3000/api/products/123
-import { NextRequest } from "next/server";
-import { products } from "@/app/data/product-data";
+import {NextRequest} from "next/server";
+import {products} from "@/app/data/product-data";
 
 type Params = {
     id: string
@@ -28,7 +28,7 @@ The use of NextRequest instead of Request is specific to Next.js and offers some
 // GET http://localhost:3000/api/products/111
 // GET http://localhost:3000/api/products/111,222
 // using route handler to use route parameters as a request body to return the requested product(s)
-export async function GET(request: NextRequest, { params }: { params: Promise<Params> }) {
+export async function GET(request: NextRequest, {params}: { params: Promise<Params> }) {
     console.log("GET request received at /api/products: ", request);
     console.log("GET Url: ", request.url);
     console.log("Params: ", params);
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Pa
             return new Response(
                 JSON.stringify(products),
                 {
-                    headers: {'Content-Type': 'application/json'},
+                    headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                     status: 200,
                 }
             );
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Pa
                 return new Response(
                     JSON.stringify(product),
                     {
-                        headers: {'Content-Type': 'application/json'},
+                        headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                         status: 200,
                     }
                 );
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Pa
                 return new Response(
                     JSON.stringify({error: 'Product not found'}),
                     {
-                        headers: {'Content-Type': 'application/json'},
+                        headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                         status: 404,
                     }
                 );
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Pa
                 return new Response(
                     JSON.stringify(foundProducts),
                     {
-                        headers: {'Content-Type': 'application/json'},
+                        headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                         status: 200,
                     }
                 );
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Pa
                 return new Response(
                     JSON.stringify({error: 'No products found'}),
                     {
-                        headers: {'Content-Type': 'application/json'},
+                        headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                         status: 404,
                     }
                 );
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Pa
         return new Response(
             JSON.stringify({error: 'Internal Server Error'}),
             {
-                headers: {'Content-Type': 'application/json'},
+                headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                 status: 500,
             }
         );
