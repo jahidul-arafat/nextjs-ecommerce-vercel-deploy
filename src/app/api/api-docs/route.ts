@@ -4,6 +4,7 @@ import fs from 'fs';
 
 const USERNAME = process.env.API_DOCS_USERNAME;
 const PASSWORD = process.env.API_DOCS_PASSWORD;
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
 export async function GET(req: NextRequest) {
     // Check for basic auth header
@@ -32,7 +33,15 @@ export async function GET(req: NextRequest) {
     const swaggerYamlPath = path.join(process.cwd(), 'swagger.yaml');
 
     const html = fs.readFileSync(swaggerUiPath, 'utf-8');
-    const yaml = fs.readFileSync(swaggerYamlPath, 'utf-8');
+    let yaml = fs.readFileSync(swaggerYamlPath, 'utf-8');
+
+    // Replace ${NEXT_PUBLIC_SITE_URL} with actual value
+    if (!SITE_URL) {
+        console.error('NEXT_PUBLIC_SITE_URL is not defined in the environment.');
+        return new NextResponse('Internal Server Error', { status: 500 });
+    }
+    yaml = yaml.replace(/\${NEXT_PUBLIC_SITE_URL}/g, SITE_URL);
+    console.log('NEXT_PUBLIC_SITE_URL:', SITE_URL);
 
     const finalHtml = html.replace('__SWAGGER_YAML__', yaml);
 
