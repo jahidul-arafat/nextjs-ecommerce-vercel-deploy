@@ -6,7 +6,7 @@ info:
   URL https://www.linkedin.com/in/jahidul-arafat-presidential-fellow-phd-student-791a7490/"
 
 servers:
-  - url: http://localhost:3000/api
+  - url: ${NEXT_PUBLIC_SITE_URL}/api
 
 paths:
   /api-docs:
