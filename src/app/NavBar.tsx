@@ -27,18 +27,17 @@
 import Link from "next/link";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import {useUser} from './UserContext';
 
 function NavBar() {
-    const [user, setUser] = useState<string | null>(null);
+    //const [user, setUser] = useState<string | null>(null);
+    const {user,setUser, cartCount,setCartCount}= useUser();
     const [showDropdown, setShowDropdown] = useState(false);
     const router = useRouter();
 
-    useEffect(() => {
-        const loggedInUser = localStorage.getItem('user');
-        if (loggedInUser) {
-            setUser(loggedInUser);
-        }
-    }, []);
+    // archtiecture
+    const [showArchitectureMenu, setShowArchitectureMenu] = useState(false);
+    const [expandedCategory, setExpandedCategory] = useState('');
 
     const handleLogin = () => {
         const username = prompt("Please enter your username to login:");
@@ -51,9 +50,19 @@ function NavBar() {
     const handleLogout = () => {
         localStorage.removeItem('user');
         setUser(null);
+        setCartCount(0);
         setShowDropdown(false);
         router.push('/products');
     };
+
+
+    useEffect(() => {
+        const loggedInUser = localStorage.getItem('user');
+        if (loggedInUser) {
+            setUser(loggedInUser);
+        }
+    }, []);
+
 
     return (
         <nav className="bg-white shadow-md">
@@ -68,10 +77,67 @@ function NavBar() {
                                 <Link className="text-gray-700 hover:text-black" href={`/user/${user}/cart`}>Cart</Link>
                             </li>
                             <li>
-                                <Link className="text-gray-700 hover:text-black" href={`/user/${user}/checkout`}>Checkout</Link>
+                                <Link className="text-gray-700 hover:text-black"
+                                      href={`/user/${user}/checkout`}>Checkout</Link>
                             </li>
+                            <li>
+                                <Link className="text-gray-700 hover:text-black flex items-center animate-flash" href={`/api-docs`}>
+                                    Backend
+                                    <span className="ml-1 inline-block animate-flash">⭐</span>
+                                </Link>
+                            </li>
+
                         </>
                     )}
+
+                    <li className="relative group">
+                        <button
+                            className="text-gray-700 hover:text-black"
+                            onClick={() => setShowArchitectureMenu(!showArchitectureMenu)}
+                        >
+                            See Architecture
+                        </button>
+                        {showArchitectureMenu && (
+                            <ul className="absolute left-0 mt-2 w-64 bg-white rounded-md shadow-lg py-1 z-10">
+                                <li>
+                                    <button
+                                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        onClick={() => setExpandedCategory(expandedCategory === 'api' ? '' : 'api')}
+                                    >
+                                        See API Architectures
+                                    </button>
+                                    {expandedCategory === 'api' && (
+                                        <ul className="ml-4">
+                                            <li><Link href="/architecture/api/cart"
+                                                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cart
+                                                Management API</Link></li>
+                                            <li><Link href="/architecture/api/order"
+                                                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Order
+                                                Management API</Link></li>
+                                            <li><Link href="/architecture/api/checkout"
+                                                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Checkout
+                                                Management API</Link></li>
+                                            <li><Link href="/architecture/api/product"
+                                                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Product
+                                                Management API</Link></li>
+                                        </ul>
+                                    )}
+                                </li>
+                                <li>
+                                    <Link href="/architecture/state"
+                                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        See Internal State Transition
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link href="/architecture/lifecycle"
+                                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        Components Lifecycle Management
+                                    </Link>
+                                </li>
+                            </ul>
+                        )}
+                    </li>
                 </ul>
                 <div className="relative">
                     {user ? (
@@ -98,6 +164,10 @@ function NavBar() {
                                     <Link href={`/user/${user}/favorite`}
                                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                         My Favorites
+                                    </Link>
+                                    <Link href={`/user/${user}/order`}
+                                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        My Orders
                                     </Link>
                                     <button
                                         onClick={handleLogout}

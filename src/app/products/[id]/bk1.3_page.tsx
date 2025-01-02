@@ -5,25 +5,48 @@ import Link from "next/link";
 import {Product} from "@/app/data/product-data";
 import NotFoundPage from "@/app/not-found";
 import {addToCart, addToFavorite} from "@/app/utils/utils";
-import {useUser} from "@/app/UserContext";
+// import { fetchAllProducts } from "@/app/utils/utils";
 
 export const dynamic='force-dynamic';
 
+// this is an individual product details page component
 export default function ProductDetailsPage({params}: { params: Promise<{ id: string }> }) {
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
-    const [quantity, setQuantity] = useState(1);
     const resolvedParams = React.use(params);
-    const {user} = useUser(); // a central context to tag the user status
 
+    // ineffective hook to fetch the product data when the component mounts
+    // why inefficient?
+    // because, to render a single product page, we need to fetch all products first.
+    // Solution: use the /products/[id] API endpoint to fetch a single product details instead of fetching all products in the component mount hook
+    // useEffect(() => {
+    //     async function loadProduct() {
+    //         setLoading(true);
+    //         try {
+    //             const allProducts = await fetchAllProducts(); // calling the API to fetch all products
+    //             const foundProduct = allProducts.find(p => p.id === resolvedParams.id);
+    //             setProduct(foundProduct || null);
+    //         } catch (error) {
+    //             console.error("Error fetching product:", error);
+    //             setProduct(null);
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     }
+    //
+    //     loadProduct();
+    // }, [resolvedParams.id]);
+
+    // Efficient useEffect hook to fetch the product data when the component mounts
     useEffect(() => {
         async function loadProduct() {
             setLoading(true);
             try {
-                const response = await fetch(`/api/products?id=${resolvedParams.id}`);
+                //const response = await fetch(`/api/products/${resolvedParams.id}`);
+                const response = await fetch(`/api/products?id=${resolvedParams.id}`); // server-side API route to fetch a single product details
                 if (!response.ok) {
                     console.error('Product not found');
-                    return;
+                    return; // early exit to avoid unnecessary work
                 }
                 const productData = await response.json();
                 setProduct(productData);
@@ -38,49 +61,25 @@ export default function ProductDetailsPage({params}: { params: Promise<{ id: str
         loadProduct();
     }, [resolvedParams.id]);
 
-    // const handleAddToCart = async () => {
-    //     if (!product) return;
-    //
-    //     if (quantity <= 0) {
-    //         alert("Please set the quantity to at least 1 before adding to cart.");
+    // const addToCart = () => {
+    //     const user = localStorage.getItem('user');
+    //     if (!user) {
+    //         alert("Please log in to add items to your cart.");
     //         return;
     //     }
     //
-    //     try {
-    //         for (let i = 0; i < quantity; i++) {
-    //             await addToCart(product);
-    //         }
-    //         alert(`${quantity} ${quantity === 1 ? 'item' : 'items'} of ${product.name} added to cart.`);
-    //     } catch (error) {
-    //         alert(error instanceof Error ? error.message : 'An error occurred');
+    //     if (product) {
+    //         const cartKey = `${user}_cart`;
+    //         const cart = JSON.parse(localStorage.getItem(cartKey) || '[]');
+    //         cart.push(product);
+    //         localStorage.setItem(cartKey, JSON.stringify(cart));
+    //         alert(`${product.name} has been added to your cart.`);
     //     }
     // };
 
-    // improved handleAddToCart function with user status check
-    const handleAddToCart = async () => {
-        if (!product) return;
-
-        if (quantity <= 0) {
-            alert("Please set the quantity to at least 1 before adding to cart.");
-            return;
-        }
-
-        if (!user) {
-            alert("Please log in to add items to your cart.");
-            return;
-        }
-
+    const handleAddToCart = async (product: Product) => {
         try {
-            // if the quantity is greater than 1, add multiple items to the cart
-            if (quantity >= 1) {
-                for (let i = 0; i < quantity; i++) {
-                    await addToCart(product,quantity);
-                }
-                alert(`${quantity} ${quantity === 1? 'item' : 'items'} of ${product.name} added to cart.`);
-                return;
-            }
-            //await addToCart(product,quantity);
-            //alert(`${quantity} ${quantity === 1 ? 'item' : 'items'} of ${product.name} added to cart.`);
+            await addToCart(product);
         } catch (error) {
             alert(error instanceof Error ? error.message : 'An error occurred');
         }
@@ -113,24 +112,17 @@ export default function ProductDetailsPage({params}: { params: Promise<{ id: str
                     <h1 className="text-4xl font-bold mb-4">{product.name}</h1>
                     <p className="text-2xl text-gray-600 mb-6">${product.price}</p>
                     <p className="text-gray-700 mb-6">{product.description}</p>
-                    <div className="flex items-center space-x-4 mb-6">
-                        <label htmlFor="quantity" className="text-gray-700">Quantity:</label>
-                        <input
-                            type="number"
-                            id="quantity"
-                            min="1"
-                            value={quantity}
-                            onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value)))}
-                            className="border rounded px-2 py-1 w-16 text-center"
-                        />
-                    </div>
                     <div className="flex space-x-4 mb-6">
-                        <button onClick={handleAddToCart}
+
+                        <button onClick={(e) => {
+                            e.preventDefault(); // prevent the browser from following the link
+                            handleAddToCart(product);
+                        }}
                                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                             Add to Cart
                         </button>
                         <button onClick={(e) => {
-                            e.preventDefault();
+                            e.preventDefault(); // prevent the browser from following the link
                             handleAddToFavorite(product)
                         }}
                                 className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">

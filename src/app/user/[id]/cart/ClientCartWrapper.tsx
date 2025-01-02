@@ -44,17 +44,42 @@ const ClientCartWrapper = ({initialCartProducts, userId}: { initialCartProducts:
         fetchCartItems();
     }, [userId]);
 
+
     const deleteProduct = async (id: string) => {
         try {
-            const updatedCart = await deleteProductFromCart(userId, id);
-            setCartProducts(updatedCart);
+            console.log(`Attempting to delete product with id: ${id}`);
+            const response = await deleteProductFromCart(userId, id);
+            console.log("Response from deleteProductFromCart:", response);
 
-            if (updatedCart.length === 0) {
-                clearCartAndRedirect();
+            if (response && typeof response === 'object' && 'updatedCart' in response) {
+                const updatedCart = response.updatedCart;
+                console.log(`Updated cart has ${updatedCart.length} items`);
+
+                // Fetch the full details of the remaining products
+                const fullUpdatedCart = await Promise.all(updatedCart.map(async (item: Product) => {
+                    const productResponse = await fetch(`http://localhost:3000/api/products/${item.id}`);
+                    if (productResponse.ok) {
+                        return await productResponse.json();
+                    }
+                    return item; // If fetch fails, keep the original item
+                }));
+
+                console.log("Full updated cart:", fullUpdatedCart);
+                setCartProducts(fullUpdatedCart);
+
+                if (fullUpdatedCart.length === 0) {
+                    console.log("Cart is now empty, redirecting...");
+                    clearCartAndRedirect();
+                } else {
+                    console.log("Cart still has items, staying on page");
+                }
+            } else {
+                console.error("Unexpected response format from deleteProductFromCart:", response);
+                // Handle unexpected response format
             }
         } catch (error) {
-            console.error("Error deleting product:", error);
-            // Handle error (e.g., show error message)
+            console.error("Error in deleteProduct:", error);
+            // Handle error (e.g., show error message to user)
         }
     };
 
@@ -97,7 +122,7 @@ const ClientCartWrapper = ({initialCartProducts, userId}: { initialCartProducts:
     //     }
     // };
 
-    const totalPrice = cartProducts.reduce((sum, product) => sum + product.price, 0);
+    const totalPrice = cartProducts? cartProducts.reduce((sum, product) => sum + product.price, 0):0;
 
     return (
         <ShoppingCartList

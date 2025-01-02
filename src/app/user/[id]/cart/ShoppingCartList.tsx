@@ -7,9 +7,8 @@ import { Product } from "@/app/data/product-data";
 import Link from "next/link";
 import Image from "next/image";
 
-// render the cart page
-const renderCartItems = (cartProducts: Product[], onDelete:(id:string)=>void) => {
-    return cartProducts.map((product,index) => (
+const renderCartItems = (cartProducts: Product[], onDelete: (id: string) => void) => {
+    return cartProducts.map((product, index) => (
         <div key={`${product.id}-${index}`} className="flex items-center border-b border-gray-200 py-4">
             <Link href={"/products/" + product.id} className="flex items-center w-full">
                 <div className="w-24 h-24 mr-4 relative">
@@ -24,7 +23,11 @@ const renderCartItems = (cartProducts: Product[], onDelete:(id:string)=>void) =>
                 <div className="flex-grow">
                     <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
                     <p className="text-sm text-gray-600">Product ID: {product.id}</p>
-                    <p className="text-lg font-bold text-blue-600">${product.price.toFixed(2)}</p>
+                    <p className="text-lg font-bold text-blue-600">
+                        {typeof product.price === 'number' && !isNaN(product.price)
+                            ? `$${product.price.toFixed(2)}`
+                            : 'Price unavailable'}
+                    </p>
                 </div>
             </Link>
             <button
@@ -37,13 +40,18 @@ const renderCartItems = (cartProducts: Product[], onDelete:(id:string)=>void) =>
     ));
 };
 
-// ShoppingCartList component
-const ShoppingCartList = ({ cartProducts, totalPrice, deleteProduct, userId }: {
+const ShoppingCartList = ({cartProducts, totalPrice, deleteProduct, userId}: {
     cartProducts: Product[],
     totalPrice: number,
     deleteProduct: (id: string) => void,
     userId: string
 }) => {
+    // Calculate total price here to ensure it's always up-to-date
+    const calculatedTotalPrice = cartProducts.reduce((total, product) =>
+        total + (typeof product.price === 'number' && !isNaN(product.price) ? product.price : 0), 0);
+
+    console.log('Cart Products:', cartProducts); // Add this line for debugging
+
     return (
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-6 text-gray-800">Shopping Cart</h1>
@@ -56,10 +64,12 @@ const ShoppingCartList = ({ cartProducts, totalPrice, deleteProduct, userId }: {
                         <div className="bg-gray-50 px-4 py-3 sm:px-6">
                             <div className="flex justify-between items-center">
                                 <span className="text-lg font-semibold text-gray-900">Total:</span>
-                                <span className="text-2xl font-bold text-blue-600">${totalPrice.toFixed(2)}</span>
+                                <span className="text-2xl font-bold text-blue-600">${calculatedTotalPrice.toFixed(2)}</span>
                             </div>
-                            <Link href={`/user/${userId}/checkout?items=${cartProducts.map(p => p.id).join(',')}`} className="block mt-4 w-full">
-                                <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+                            <Link href={`/user/${userId}/checkout?items=${cartProducts.map(p => p.id).join(',')}`}
+                                  className="block mt-4 w-full">
+                                <button
+                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
                                     Proceed to Checkout
                                 </button>
                             </Link>

@@ -99,7 +99,7 @@ export function CartPage({ params }: { params: Promise<{ id: string }> }) {
                 //setAllProducts(fetchedProducts);
 
                 //const cartItems = JSON.parse(localStorage.getItem(`${userId}_cart`) || '[]');
-                const cartItems= await fetch('http://localhost:3000/api/user/' + userId + '/cart');
+                const cartItems= await fetch(process.env.NEXT_PUBLIC_SITE_URL +'/api/user/' + userId + '/cart');
 
                 // const validCartProducts: Product[] = cartItems.filter((item: Product) =>
                 //     fetchedProducts.some(p => p.id === item.id)

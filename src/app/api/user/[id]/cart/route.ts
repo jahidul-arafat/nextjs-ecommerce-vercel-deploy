@@ -51,7 +51,7 @@ export async function GET(request: NextRequest, {params}: { params: Promise<Para
         const cartItemIDs = mockCarts[userId] || [];
 
         // Fetch all products from the /api/products endpoint
-        const productsResponse = await fetch('http://localhost:3000/api/products');
+        const productsResponse = await fetch(process.env.NEXT_PUBLIC_SITE_URL+'/api/products');
         if (!productsResponse.ok) {
             console.error('Failed to fetch products');
             return;
@@ -221,56 +221,26 @@ type DeleteCartBody = {
 }
 
 // DELETE http://localhost:3000/api/user/[id]/cart
-export async function DELETE(request: NextRequest, {params}: { params: Promise<Params> }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<Params> }) {
     const resolvedParams = await params;
     const userId = resolvedParams.id;
     const body: DeleteCartBody = await request.json();
 
-    let productIds: string[];
-
-    // get the current state of mockCarts
-    logMockCarts();
-
     // Log the cart contents before deletion
     console.log(`Cart contents for user ${userId} before deletion:`, mockCarts[userId]);
 
-
-    if (body.productId !== undefined) {
-        if (Array.isArray(body.productId)) {
-            productIds = body.productId;
-            console.warn("Warning: 'productId' was sent as an array. Treating it as 'productIds'.");
-        } else {
-            productIds = [body.productId];
-        }
-    } else if (body.productIds !== undefined) {
-        if (Array.isArray(body.productIds)) {
-            productIds = body.productIds;
-        } else {
-            productIds = [body.productIds];
-            console.warn("Warning: 'productIds' was sent as a single string. Treating it as a single product ID.");
-        }
-    } else {
-        return NextResponse.json({error: "Invalid input. Provide either 'productId' or 'productIds'"}, {
+    if (!body.productIds || !Array.isArray(body.productIds) || body.productIds.length === 0) {
+        return NextResponse.json({ error: "Invalid input. Provide 'productIds' as a non-empty array" }, {
             status: 400,
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json' },
         });
     }
-
-    if (productIds.length === 0) {
-        return NextResponse.json({error: "Empty product list"}, {
-            status: 400,
-            headers: {'Content-Type': 'application/json'},
-        });
-    }
-
-    // Log the request and the user's ID
-    console.log(`DELETE request received at /api/user/${userId}/cart with product IDs: ${productIds.join(', ')}`);
 
     // Check if user exists in mock data
     if (!mockCarts[userId]) {
-        return NextResponse.json({error: "User not found"}, {
+        return NextResponse.json({ error: "User not found" }, {
             status: 404,
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json' },
         });
     }
 
@@ -278,15 +248,18 @@ export async function DELETE(request: NextRequest, {params}: { params: Promise<P
     const notFoundProducts: string[] = [];
 
     // Remove products from the cart
-    productIds.forEach(productId => {
+    body.productIds.forEach(productId => {
         const index = mockCarts[userId].indexOf(productId);
-        if (index !== -1) { // If the product exists in the cart, remove it and add it to the deletedProducts array
-            mockCarts[userId].splice(index, 1); // Remove the product; explain 'index, 1' means remove one element at the specified index
-            deletedProducts.push(productId); // Add the product to the deletedProducts array
+        if (index !== -1) {
+            mockCarts[userId].splice(index, 1);
+            deletedProducts.push(productId);
         } else {
-            notFoundProducts.push(productId); // Add the product to the notFoundProducts array
+            notFoundProducts.push(productId);
         }
     });
+
+    // Log the cart contents after deletion
+    console.log(`Cart contents for user ${userId} after deletion:`, mockCarts[userId]);
 
     // Prepare the response
     const response = {
@@ -298,15 +271,99 @@ export async function DELETE(request: NextRequest, {params}: { params: Promise<P
     // Determine the appropriate status code
     const status = notFoundProducts.length > 0 ? 207 : 200; // 207 Multi-Status if some products were not found
 
-    // Log the result
-    console.log(`Deleted products ${deletedProducts.join(', ')} from user ${userId}'s cart`);
-
-    // After processing the deletion, log the updated cart contents
-    console.log(`Cart contents for user ${userId} after deletion:`, mockCarts[userId]);
-
     // Return the response
     return NextResponse.json(response, {
         status,
-        headers: {'Content-Type': 'application/json'}
+        headers: { 'Content-Type': 'application/json' }
     });
 }
+
+// export async function DELETE(request: NextRequest, {params}: { params: Promise<Params> }) {
+//     const resolvedParams = await params;
+//     const userId = resolvedParams.id;
+//     const body: DeleteCartBody = await request.json();
+//
+//     let productIds: string[];
+//
+//     // get the current state of mockCarts
+//     logMockCarts();
+//
+//     // Log the cart contents before deletion
+//     console.log(`Cart contents for user ${userId} before deletion:`, mockCarts[userId]);
+//
+//
+//     if (body.productId !== undefined) {
+//         if (Array.isArray(body.productId)) {
+//             productIds = body.productId;
+//             console.warn("Warning: 'productId' was sent as an array. Treating it as 'productIds'.");
+//         } else {
+//             productIds = [body.productId];
+//         }
+//     } else if (body.productIds !== undefined) {
+//         if (Array.isArray(body.productIds)) {
+//             productIds = body.productIds;
+//         } else {
+//             productIds = [body.productIds];
+//             console.warn("Warning: 'productIds' was sent as a single string. Treating it as a single product ID.");
+//         }
+//     } else {
+//         return NextResponse.json({error: "Invalid input. Provide either 'productId' or 'productIds'"}, {
+//             status: 400,
+//             headers: {'Content-Type': 'application/json'},
+//         });
+//     }
+//
+//     if (productIds.length === 0) {
+//         return NextResponse.json({error: "Empty product list"}, {
+//             status: 400,
+//             headers: {'Content-Type': 'application/json'},
+//         });
+//     }
+//
+//     // Log the request and the user's ID
+//     console.log(`DELETE request received at /api/user/${userId}/cart with product IDs: ${productIds.join(', ')}`);
+//
+//     // Check if user exists in mock data
+//     if (!mockCarts[userId]) {
+//         return NextResponse.json({error: "User not found"}, {
+//             status: 404,
+//             headers: {'Content-Type': 'application/json'},
+//         });
+//     }
+//
+//     const deletedProducts: string[] = [];
+//     const notFoundProducts: string[] = [];
+//
+//     // Remove products from the cart
+//     productIds.forEach(productId => {
+//         const index = mockCarts[userId].indexOf(productId);
+//         if (index !== -1) { // If the product exists in the cart, remove it and add it to the deletedProducts array
+//             mockCarts[userId].splice(index, 1); // Remove the product; explain 'index, 1' means remove one element at the specified index
+//             deletedProducts.push(productId); // Add the product to the deletedProducts array
+//         } else {
+//             notFoundProducts.push(productId); // Add the product to the notFoundProducts array
+//         }
+//     });
+//
+//     // Prepare the response
+//     const response = {
+//         deletedProducts,
+//         notFoundProducts,
+//         updatedCart: mockCarts[userId]
+//     };
+//
+//     // Determine the appropriate status code
+//     const status = notFoundProducts.length > 0 ? 207 : 200; // 207 Multi-Status if some products were not found
+//
+//     // Log the result
+//     console.log(`Deleted products ${deletedProducts.join(', ')} from user ${userId}'s cart`);
+//
+//     // After processing the deletion, log the updated cart contents
+//     console.log(`Cart contents for user ${userId} after deletion:`, mockCarts[userId]);
+//
+//     // Return the response
+//     return NextResponse.json(response, {
+//         status,
+//         headers: {'Content-Type': 'application/json'}
+//     });
+// }
