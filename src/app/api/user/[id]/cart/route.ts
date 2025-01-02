@@ -17,6 +17,12 @@ type Params = {
     id: string,
 }
 
+const headers = {
+    'Access-Control-Allow-Origin': '*', // Replace '*' with your frontend domain if necessary
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+};
+
 // For server side logging to get the current state of mockCarts which is useful for debugging and testing.
 // mockCarts updated are stored in server's in-memory state.
 function logMockCarts() {
@@ -39,7 +45,7 @@ export async function GET(request: NextRequest, {params}: { params: Promise<Para
     if (!mockCarts[userId]) {
         return NextResponse.json({error: "User not found"}, {
             status: 404,
-            headers: {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'},
+            headers: {'Content-Type': 'application/json',...headers},
         });
     }
 
@@ -85,13 +91,13 @@ export async function GET(request: NextRequest, {params}: { params: Promise<Para
         // Return the cart products
         return NextResponse.json(validCartProducts, {
             status: 200,
-            headers: {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'}
+            headers: {'Content-Type': 'application/json',...headers}
         });
     } catch (error) {
         console.error("Error fetching cart items:", error);
         return NextResponse.json({error: "Failed to fetch cart items"}, {
             status: 500,
-            headers: {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'},
+            headers: {'Content-Type': 'application/json',...headers},
         });
     }
 }
@@ -139,14 +145,14 @@ export async function POST(request: NextRequest, {params}: { params: Promise<Par
     } else {
         return NextResponse.json({error: "Invalid input. Provide either 'productId' or 'productIds'"}, {
             status: 400,
-            headers: {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'},
+            headers: {'Content-Type': 'application/json',...headers},
         });
     }
 
     if (productIds.length === 0) {
         return NextResponse.json({error: "Empty product list"}, {
             status: 400,
-            headers: {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'},
+            headers: {'Content-Type': 'application/json',...headers},
         });
     }
 
@@ -185,7 +191,7 @@ export async function POST(request: NextRequest, {params}: { params: Promise<Par
     // Return the response
     return NextResponse.json(response, {
         status,
-        headers: {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'}
+        headers: {'Content-Type': 'application/json',...headers}
     });
 }
 

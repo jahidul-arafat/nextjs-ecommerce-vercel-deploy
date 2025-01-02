@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
         'Access-Control-Allow-Origin': '*', // Replace '*' with your frontend domain if necessary
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
         'Access-Control-Allow-Headers': 'Authorization, Content-Type',
-    };ß
+    };
 
     if (req.method === 'OPTIONS') {
         return new NextResponse(null, { status: 204, headers });

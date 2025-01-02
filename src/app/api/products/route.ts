@@ -17,6 +17,13 @@ The /data/products-data file itself is not being updated. This means that when y
 This behavior is typical for development environments or when working with in-memory data stores. It allows for quick testing and development without constantly writing to files or databases.
  */
 
+// Add CORS headers
+const headers = {
+    'Access-Control-Allow-Origin': '*', // Replace '*' with your frontend domain if necessary
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+};
+
 // GET request, return a Response()
 // http://localhost:3000/api/products (all products)
 // http://localhost:3000/api/products?id=<product_id> (single product)
@@ -37,7 +44,7 @@ export async function GET(request: Request) {
                     {
                         headers: {
                             'Content-Type': 'application/json',
-                            'Access-Control-Allow-Origin': '*'
+                            ...headers
                         }, // what this string will be returned to the client when received at the client end
                         status: 200,
                     }
@@ -46,7 +53,7 @@ export async function GET(request: Request) {
                 return new Response(
                     JSON.stringify({error: 'Product not found'}),
                     {
-                        headers: {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'},
+                        headers: {'Content-Type': 'application/json',...headers},
                         status: 404,
                     }
                 );
@@ -56,7 +63,7 @@ export async function GET(request: Request) {
             return new Response(
                 JSON.stringify(products),
                 {
-                    headers: {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'},
+                    headers: {'Content-Type': 'application/json',...headers},
                     status: 200,
                 }
             );
@@ -66,7 +73,7 @@ export async function GET(request: Request) {
         return new Response(
             JSON.stringify({error: 'Internal Server Error'}),
             {
-                headers: {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'},
+                headers: {'Content-Type': 'application/json',...headers},
                 status: 500,
             }
         );
@@ -119,7 +126,7 @@ export async function POST(request: Request) {
         return new Response(
             JSON.stringify(response),
             {
-                headers: {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'},
+                headers: {'Content-Type': 'application/json',...headers},
                 status: 201,
             }
         );
@@ -128,7 +135,7 @@ export async function POST(request: Request) {
         return new Response(
             JSON.stringify({error: 'Internal Server Error'}),
             {
-                headers: {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'},
+                headers: {'Content-Type': 'application/json',...headers},
                 status: 500,
             });
     }
@@ -146,7 +153,7 @@ export async function DELETE(request: Request) {
             return new Response(
                 JSON.stringify({error: 'Product ID is required'}),
                 {
-                    headers: {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'},
+                    headers: {'Content-Type': 'application/json',...headers},
                     status: 400,
                 }
             );
@@ -159,7 +166,7 @@ export async function DELETE(request: Request) {
             return new Response(
                 JSON.stringify({error: 'Product not found'}),
                 {
-                    headers: {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'},
+                    headers: {'Content-Type': 'application/json',...headers},
                     status: 404,
                 }
             );
@@ -172,7 +179,7 @@ export async function DELETE(request: Request) {
         return new Response(
             JSON.stringify(deletedProduct),
             {
-                headers: {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'},
+                headers: {'Content-Type': 'application/json',...headers},
                 status: 200,
             }
         );
@@ -181,7 +188,7 @@ export async function DELETE(request: Request) {
         return new Response(
             JSON.stringify({error: 'Internal Server Error'}),
             {
-                headers: {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'},
+                headers: {'Content-Type': 'application/json',...headers},
                 status: 500,
             }
         );
@@ -200,7 +207,7 @@ export async function PUT(request: Request) {
             return new Response(
                 JSON.stringify({error: 'Product ID is required'}),
                 {
-                    headers: {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'},
+                    headers: {'Content-Type': 'application/json',...headers},
                     status: 400,
                 }
             );
@@ -223,7 +230,7 @@ export async function PUT(request: Request) {
             return new Response(
                 JSON.stringify({error: 'Product not found'}),
                 {
-                    headers: {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'},
+                    headers: {'Content-Type': 'application/json',...headers},
                     status: 404,
                 }
             );
@@ -246,7 +253,7 @@ export async function PUT(request: Request) {
         return new Response(
             JSON.stringify(products[productIndex]),
             {
-                headers: {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'},
+                headers: {'Content-Type': 'application/json',...headers},
                 status: 200,
             }
         );
@@ -255,7 +262,7 @@ export async function PUT(request: Request) {
         return new Response(
             JSON.stringify({error: 'Internal Server Error'}),
             {
-                headers: {'Content-Type': 'application/json','Access-Control-Allow-Origin': '*'},
+                headers: {'Content-Type': 'application/json',...headers},
                 status: 500,
             }
         );

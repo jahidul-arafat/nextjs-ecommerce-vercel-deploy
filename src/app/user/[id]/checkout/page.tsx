@@ -19,6 +19,13 @@ interface PaymentData {
     totalPrice: number;
 }
 
+// Add CORS headers
+const headers = {
+    'Access-Control-Allow-Origin': '*', // Replace '*' with your frontend domain if necessary
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+};
+
 // Mock function to simulate payment processing
 const mockProcessPayment = async (paymentData: PaymentData): Promise<{ success: boolean, transactionId: string }> => {
     // Simulate network delay
@@ -202,6 +209,7 @@ export default function CheckoutPage({params}: { params: Promise<{ id: string }>
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        ...headers
                     },
                     body: JSON.stringify(order),
                 });
@@ -215,6 +223,7 @@ export default function CheckoutPage({params}: { params: Promise<{ id: string }>
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
+                        ...headers
                     },
                     body: JSON.stringify({
                         productIds: cartItems.map(item => item.id)
