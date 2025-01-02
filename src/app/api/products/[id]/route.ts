@@ -51,7 +51,7 @@ export async function GET(request: NextRequest, {params}: { params: Promise<Para
             return new Response(
                 JSON.stringify(products),
                 {
-                    headers: {'Content-Type': 'application/json',...headers},
+                    headers: {'Content-Type': 'application/json'},
                     status: 200,
                 }
             );
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest, {params}: { params: Promise<Para
                 return new Response(
                     JSON.stringify(product),
                     {
-                        headers: {'Content-Type': 'application/json',...headers},
+                        headers: {'Content-Type': 'application/json'},
                         status: 200,
                     }
                 );
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest, {params}: { params: Promise<Para
                 return new Response(
                     JSON.stringify({error: 'Product not found'}),
                     {
-                        headers: {'Content-Type': 'application/json',...headers},
+                        headers: {'Content-Type': 'application/json'},
                         status: 404,
                     }
                 );
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest, {params}: { params: Promise<Para
                 return new Response(
                     JSON.stringify(foundProducts),
                     {
-                        headers: {'Content-Type': 'application/json',...headers},
+                        headers: {'Content-Type': 'application/json'},
                         status: 200,
                     }
                 );
@@ -92,7 +92,7 @@ export async function GET(request: NextRequest, {params}: { params: Promise<Para
                 return new Response(
                     JSON.stringify({error: 'No products found'}),
                     {
-                        headers: {'Content-Type': 'application/json',...headers},
+                        headers: {'Content-Type': 'application/json'},
                         status: 404,
                     }
                 );
@@ -103,7 +103,7 @@ export async function GET(request: NextRequest, {params}: { params: Promise<Para
         return new Response(
             JSON.stringify({error: 'Internal Server Error'}),
             {
-                headers: {'Content-Type': 'application/json',...headers},
+                headers: {'Content-Type': 'application/json'},
                 status: 500,
             }
         );

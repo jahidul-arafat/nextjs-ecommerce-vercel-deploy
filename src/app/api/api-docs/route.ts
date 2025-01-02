@@ -8,14 +8,14 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
 export async function GET(req: NextRequest) {
     // Add CORS headers
-    const headers = {
-        'Access-Control-Allow-Origin': '*', // Replace '*' with your frontend domain if necessary
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Authorization, Content-Type',
-    };
+    // const headers = {
+    //     'Access-Control-Allow-Origin': '*', // Replace '*' with your frontend domain if necessary
+    //     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    //     'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+    // };
 
     if (req.method === 'OPTIONS') {
-        return new NextResponse(null, { status: 204, headers });
+        return new NextResponse(null, { status: 204 });
     }
 
     // Existing authentication and file reading logic
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
     if (!authHeader || !authHeader.startsWith('Basic ')) {
         return new NextResponse('Authentication required', {
             status: 401,
-            headers: { 'WWW-Authenticate': 'Basic realm="Secure Area"', ...headers },
+            headers: { 'WWW-Authenticate': 'Basic realm="Secure Area"'},
         });
     }
 
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
     if (username !== USERNAME || password !== PASSWORD) {
         return new NextResponse('Invalid Authentication Credentials', {
             status: 401,
-            headers: { 'WWW-Authenticate': 'Basic realm="Secure Area"', ...headers },
+            headers: { 'WWW-Authenticate': 'Basic realm="Secure Area"'},
         });
     }
 
@@ -47,11 +47,11 @@ export async function GET(req: NextRequest) {
 
     if (!SITE_URL) {
         console.error('NEXT_PUBLIC_SITE_URL is not defined in the environment.');
-        return new NextResponse('Internal Server Error', { status: 500, headers });
+        return new NextResponse('Internal Server Error', { status: 500});
     }
 
     yaml = yaml.replace(/\${NEXT_PUBLIC_SITE_URL}/g, SITE_URL);
     const finalHtml = html.replace('__SWAGGER_YAML__', yaml);
 
-    return new NextResponse(finalHtml, { headers: { 'Content-Type': 'text/html', ...headers } });
+    return new NextResponse(finalHtml, { headers: { 'Content-Type': 'text/html'} });
 }
