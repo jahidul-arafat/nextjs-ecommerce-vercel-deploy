@@ -13,7 +13,7 @@ const ClientCartWrapper = ({initialCartProducts, userId}: { initialCartProducts:
     const clearCartAndRedirect = () => {
         console.log("Clearing cart and redirecting to the /products page");
         setCartProducts([]);
-        router.push("/products");
+        //router.push("/products");
     };
 
     // hook
