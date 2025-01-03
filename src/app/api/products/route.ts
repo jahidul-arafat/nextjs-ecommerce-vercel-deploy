@@ -1,4 +1,6 @@
-import {Product, products} from "@/app/data/product-data";
+//import {Product, products} from "@/app/data/product-data";
+import {Product} from "@/app/data/product-data";
+import {connectToDb} from "@/app/api/db";
 // Define function for different HTTP methods
 // This will not send back to cleint any react component, instead data just like API
 // thats why we named it route.ts, not route.tsx
@@ -28,6 +30,10 @@ This behavior is typical for development environments or when working with in-me
 // http://localhost:3000/api/products (all products)
 // http://localhost:3000/api/products?id=<product_id> (single product)
 export async function GET(request: Request) {
+    // Connect to MongoDB
+    const {db} = await connectToDb();
+    const products = await db.collection('products').find({}).toArray();
+
     console.log("GET request received at /api/products.. ");
     try {
         const url = new URL(request.url);
@@ -79,6 +85,10 @@ export async function GET(request: Request) {
 
 // POST method to handle both single product and bulk product additions, while also checking for existing product IDs.
 export async function POST(request: Request) {
+    // Connect to MongoDB
+    const {db} = await connectToDb();
+    const products = await db.collection('products').find({}).toArray();
+
     console.log("POST request received at /api/products: ", request);
     try {
         // Parse the request body
@@ -94,14 +104,14 @@ export async function POST(request: Request) {
         for (const newProduct of newProducts) {
             // Validate the new product
             if (!newProduct.id || !newProduct.name || !newProduct.imageUrl || !newProduct.description || !newProduct.price) {
-                skippedProducts.push({ id: newProduct.id || 'unknown', reason: 'Invalid product data' });
+                skippedProducts.push({id: newProduct.id || 'unknown', reason: 'Invalid product data'});
                 console.log(`Invalid product data: ${JSON.stringify(newProduct)}`);
                 continue;
             }
 
             // Check if product with the same ID already exists
             if (products.some(p => p.id === newProduct.id)) {
-                skippedProducts.push({ id: newProduct.id, reason: 'Product with this ID already exists' });
+                skippedProducts.push({id: newProduct.id, reason: 'Product with this ID already exists'});
                 console.log(`Product with ID ${newProduct.id} already exists`);
                 continue;
             }
@@ -141,6 +151,10 @@ export async function POST(request: Request) {
 // DELETE request, return a Response()
 // http://localhost:3000/api/products?id=<product_id>
 export async function DELETE(request: Request) {
+    // Connect to MongoDB
+    const {db} = await connectToDb();
+    const products = await db.collection('products').find({}).toArray();
+
     try {
         // Parse the product ID from the request URL
         const url = new URL(request.url);
@@ -195,6 +209,10 @@ export async function DELETE(request: Request) {
 // PUT method to modify a product
 // http://localhost:3000/api/products?id=<product_id>
 export async function PUT(request: Request) {
+    // Connect to MongoDB
+    const {db}= await connectToDb();
+    const products= await db.collection('products').find({}).toArray();
+
     try {
         // Parse the product ID from the request URL
         const url = new URL(request.url);

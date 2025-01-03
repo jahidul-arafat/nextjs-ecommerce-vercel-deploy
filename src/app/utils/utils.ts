@@ -1,20 +1,31 @@
 import {Product} from "@/app/data/product-data";
 
 export async function fetchAllProducts() {
-    // Fetch products from the API route
-    const response = await fetch(process.env.NEXT_PUBLIC_SITE_URL +'/api/products', {
-        method: 'GET',
-        cache: 'no-store', // means "revalidate the cached response with the server before using it."
-        headers: {
-            'Content-Type': 'application/json'
-        },
-    });
-    if (!response.ok) {
-        throw new Error('Failed to fetch products');
-    }
-    const products: Product[] = await response.json();
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/products`, {
+            method: 'GET',
+            cache: 'no-store', // Always fetch fresh data
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
 
-    return products;
+        if (!response.ok) {
+            console.error('Error fetching products:', response.statusText);
+            return [];
+        }
+
+        const products: Product[] = await response.json();
+        if (!products || products.length === 0) {
+            console.warn('No products returned from API');
+            return [];
+        }
+
+        return products;
+    } catch (error) {
+        console.error('Error in fetchAllProducts:', error);
+        return [];
+    }
 }
 
 export async function addToCart(product: Product, quantity: number = 1) {
