@@ -86,98 +86,67 @@ export async function GET(request: Request) {
 // POST method to handle both single product and bulk product additions, while also checking for existing product IDs.
 export async function POST(request: Request) {
     // Connect to MongoDB
-    const { db } = await connectToDb();
+    const {db} = await connectToDb();
+    const products = await db.collection('products').find({}).toArray();
 
-    console.log("POST request received at /api/products");
-
+    console.log("POST request received at /api/products: ", request);
     try {
         // Parse the request body
         const body = await request.json();
         console.log("Parsed request body: ", body);
 
-        // Ensure the request is either a single product or an array of products
+        // Check if it's a single product or an array of products
         const newProducts = Array.isArray(body) ? body : [body];
 
         const addedProducts: Product[] = [];
-        const skippedProducts: { id: string; reason: string }[] = [];
+        const skippedProducts: { id: string, reason: string }[] = [];
 
         for (const newProduct of newProducts) {
             // Validate the new product
-            const requiredFields = [
-                "id",
-                "name",
-                "imageUrl",
-                "description",
-                "price",
-                "supplier",
-                "genre",
-                "countryOfOrigin",
-                "material",
-                "inStock",
-            ];
-
-            // find the missing fields in the new product
-            const missingFields = requiredFields.filter(
-                (field) => !(field in newProduct)
-            );
-
-            if (missingFields.length > 0) {
-                skippedProducts.push({
-                    id: newProduct.id || "unknown",
-                    reason: `Missing required fields: ${missingFields.join(", ")}`,
-                });
+            if (!newProduct.id || !newProduct.name || !newProduct.imageUrl || !newProduct.description || !newProduct.price) {
+                skippedProducts.push({id: newProduct.id || 'unknown', reason: 'Invalid product data'});
                 console.log(`Invalid product data: ${JSON.stringify(newProduct)}`);
                 continue;
             }
 
-            // Check if a product with the same ID already exists in the database
-            const existingProduct = await db
-                .collection("products")
-                .findOne({ id: newProduct.id });
-
-            if (existingProduct) {
-                skippedProducts.push({
-                    id: newProduct.id,
-                    reason: "Product with this ID already exists",
-                });
+            // Check if product with the same ID already exists
+            if (products.some(p => p.id === newProduct.id)) {
+                skippedProducts.push({id: newProduct.id, reason: 'Product with this ID already exists'});
                 console.log(`Product with ID ${newProduct.id} already exists`);
                 continue;
             }
 
-            // Add the new product to the database
-            const result = await db.collection("products").insertOne(newProduct);
-            if (result.acknowledged) {
-                addedProducts.push(newProduct);
-                console.log(`Added new product: ${newProduct.name} (ID: ${newProduct.id})`);
-            } else {
-                console.error(`Failed to insert product: ${newProduct.id}`);
-            }
+            // Add the new product
+            console.log(`Adding new product: ${newProduct.name} (ID: ${newProduct.id})`);
+            products.push(newProduct);
+            addedProducts.push(newProduct);
         }
 
         // Prepare the response
         const response = {
             addedProducts,
             skippedProducts,
-            message: `Added ${addedProducts.length} product(s), skipped ${skippedProducts.length} product(s).`,
+            message: `Added ${addedProducts.length} product(s), skipped ${skippedProducts.length} product(s).`
         };
 
         // Return the response
-        return new Response(JSON.stringify(response), {
-            headers: { "Content-Type": "application/json" },
-            status: 201,
-        });
+        return new Response(
+            JSON.stringify(response),
+            {
+                headers: {'Content-Type': 'application/json'},
+                status: 201,
+            }
+        );
     } catch (error) {
         console.error("Error adding new product(s): ", error);
         return new Response(
-            JSON.stringify({ error: "Internal Server Error" }),
+            JSON.stringify({error: 'Internal Server Error'}),
             {
-                headers: { "Content-Type": "application/json" },
+                headers: {'Content-Type': 'application/json'},
                 status: 500,
-            }
-        );
+            });
     }
 }
-
 
 // DELETE request, return a Response()
 // http://localhost:3000/api/products?id=<product_id>
