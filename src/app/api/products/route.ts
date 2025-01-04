@@ -1,6 +1,9 @@
 //import {Product, products} from "@/app/data/product-data";
 import {Product} from "@/app/data/product-data";
 import {connectToDb} from "@/app/api/db";
+
+
+const MONGODB_COLLECTION = 'products';
 // Define function for different HTTP methods
 // This will not send back to cleint any react component, instead data just like API
 // thats why we named it route.ts, not route.tsx
@@ -32,7 +35,7 @@ This behavior is typical for development environments or when working with in-me
 export async function GET(request: Request) {
     // Connect to MongoDB
     const {db} = await connectToDb();
-    const products = await db.collection('products').find({}).toArray();
+    const products = await db.collection(`${MONGODB_COLLECTION}`).find({}).toArray();
 
     console.log("GET request received at /api/products.. ");
     try {
@@ -132,7 +135,7 @@ export async function POST(request: Request) {
 
             // Check if a product with the same ID already exists in the database
             const existingProduct = await db
-                .collection("products")
+                .collection(`${MONGODB_COLLECTION}`)
                 .findOne({ id: newProduct.id });
 
             if (existingProduct) {
@@ -145,7 +148,7 @@ export async function POST(request: Request) {
             }
 
             // Add the new product to the database
-            const result = await db.collection("products").insertOne(newProduct);
+            const result = await db.collection(`${MONGODB_COLLECTION}`).insertOne(newProduct);
             if (result.acknowledged) {
                 addedProducts.push(newProduct);
                 console.log(`Added new product: ${newProduct.name} (ID: ${newProduct.id})`);
@@ -183,8 +186,9 @@ export async function POST(request: Request) {
 // http://localhost:3000/api/products?id=<product_id>
 export async function DELETE(request: Request) {
     // Connect to MongoDB
-    const {db} = await connectToDb();
-    const products = await db.collection('products').find({}).toArray();
+    const { db } = await connectToDb();
+
+    console.log("DELETE request received at /api/products");
 
     try {
         // Parse the product ID from the request URL
@@ -193,56 +197,89 @@ export async function DELETE(request: Request) {
 
         if (!id) {
             return new Response(
-                JSON.stringify({error: 'Product ID is required'}),
+                JSON.stringify({ error: 'Product ID is required' }),
                 {
-                    headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     status: 400,
                 }
             );
         }
 
-        // Find the index of the product with the given ID
-        const productIndex = products.findIndex(p => p.id === id);
+        // Check if the product exists in the database
+        const existingProduct = await db.collection(`${MONGODB_COLLECTION}`).findOne({ id });
 
-        if (productIndex === -1) { // means product not found
+        if (!existingProduct) {
             return new Response(
-                JSON.stringify({error: 'Product not found'}),
+                JSON.stringify({ error: 'Product not found' }),
                 {
-                    headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     status: 404,
                 }
             );
         }
 
-        // Remove the product from the array
-        const deletedProduct = products.splice(productIndex, 1)[0];
+        // Delete the product from the database
+        const deleteResult = await db.collection(`${MONGODB_COLLECTION}`).deleteOne({ id });
 
-        // Return the deleted product
-        return new Response(
-            JSON.stringify(deletedProduct),
-            {
-                headers: {'Content-Type': 'application/json'},
-                status: 200,
-            }
-        );
+        if (deleteResult.deletedCount === 1) {
+            console.log(`Product with ID ${id} deleted successfully`);
+            return new Response(
+                JSON.stringify({
+                    message: `Product with ID ${id} deleted successfully`,
+                    deletedProduct: existingProduct,
+                }),
+                {
+                    headers: { 'Content-Type': 'application/json' },
+                    status: 200,
+                }
+            );
+        } else {
+            console.error(`Failed to delete product with ID ${id}`);
+            return new Response(
+                JSON.stringify({ error: 'Failed to delete the product' }),
+                {
+                    headers: { 'Content-Type': 'application/json' },
+                    status: 500,
+                }
+            );
+        }
     } catch (error) {
         console.error("Error deleting product: ", error);
         return new Response(
-            JSON.stringify({error: 'Internal Server Error'}),
+            JSON.stringify({ error: 'Internal Server Error' }),
             {
-                headers: {'Content-Type': 'application/json'},
+                headers: { 'Content-Type': 'application/json' },
                 status: 500,
             }
         );
     }
 }
 
+
 // PUT method to modify a product
 // http://localhost:3000/api/products?id=<product_id>
+// PUT method to modify a product
+// http://localhost:3000/api/products?id=<product_id>
+/*
+Testing Scenarios
+1. Valid Update: Send a PUT request with a valid id and valid fields to update
+(e.g., /api/products?id=345 with body { "price": 30, "description": "Updated description" }). V
+erify the product is updated in MongoDB and the updated details are returned.
+
+2. Invalid ID: Send a PUT request without an id or with an id that doesn't exist.
+Verify it returns the correct error message and status code (400 or 404).
+
+3. No Fields Provided: Send a PUT request with a valid id but an empty body. Verify it returns a 400 status with an appropriate error message.
+
+4. Database Error: Simulate a database connectivity issue and ensure the method returns a 500 status with an appropriate error message.
+This ensures the PUT method is robust and interacts effectively with the MongoDB collection to update products.
+ */
+
 export async function PUT(request: Request) {
     // Connect to MongoDB
-    const {db}= await connectToDb();
-    const products= await db.collection('products').find({}).toArray();
+    const { db } = await connectToDb();
+
+    console.log("PUT request received at /api/products");
 
     try {
         // Parse the product ID from the request URL
@@ -251,67 +288,79 @@ export async function PUT(request: Request) {
 
         if (!id) {
             return new Response(
-                JSON.stringify({error: 'Product ID is required'}),
+                JSON.stringify({ error: 'Product ID is required' }),
                 {
-                    headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     status: 400,
                 }
             );
         }
 
         // Parse the updated product data from the request body
-        /*
-        With Partial<Product>, a valid update request could look like this:
-        {
-            "price": 29.99,
-            "description": "Updated description"
-        }
-         */
         const updatedProduct: Partial<Product> = await request.json();
+        console.log("Updated product data:", updatedProduct);
 
-        // Find the index of the product with the given ID
-        const productIndex = products.findIndex(p => p.id === id);
-
-        if (productIndex === -1) { // means product not found
+        // Validate that at least one field is provided for the update
+        if (Object.keys(updatedProduct).length === 0) {
             return new Response(
-                JSON.stringify({error: 'Product not found'}),
+                JSON.stringify({ error: 'No fields provided for update' }),
                 {
-                    headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
+                    status: 400,
+                }
+            );
+        }
+
+        // Check if the product exists
+        const existingProduct = await db.collection(`${MONGODB_COLLECTION}`).findOne({ id });
+        if (!existingProduct) {
+            return new Response(
+                JSON.stringify({ error: 'Product not found' }),
+                {
+                    headers: { 'Content-Type': 'application/json' },
                     status: 404,
                 }
             );
         }
 
-        // Update the product
-        /*
-        This line is using the spread operator (...) to create a new object that updates the existing product with the new data. Here's what's happening:
-        1. ...products[productIndex]: This spreads all the properties of the existing product into the new object. It's like creating a copy of the original product.
-        2. ...updatedProduct: This spreads all the properties from the updatedProduct object (which contains the updates sent in the PUT request) into the new object. If there are any properties in updatedProduct that also exist in the original product, they will overwrite the original values.
-        3. id: id: This explicitly sets the id property to the original id. This is done to ensure that even if the updatedProduct included an id field, it won't change the product's ID.
-         */
-        products[productIndex] = {
-            ...products[productIndex],
-            ...updatedProduct,
-            id: id // Ensure the ID doesn't change
-        };
-
-        // Return the updated product
-        return new Response(
-            JSON.stringify(products[productIndex]),
-            {
-                headers: {'Content-Type': 'application/json'},
-                status: 200,
-            }
+        // Update the product in the database
+        const updateResult = await db.collection(`${MONGODB_COLLECTION}`).updateOne(
+            { id },
+            { $set: updatedProduct }
         );
+
+        if (updateResult.modifiedCount === 1) {
+            console.log(`Product with ID ${id} updated successfully`);
+            // Return the updated product
+            const updatedProductDetails = await db.collection(`${MONGODB_COLLECTION}`).findOne({ id });
+            return new Response(
+                JSON.stringify(updatedProductDetails),
+                {
+                    headers: { 'Content-Type': 'application/json' },
+                    status: 200,
+                }
+            );
+        } else {
+            console.error(`Failed to update product with ID ${id}`);
+            return new Response(
+                JSON.stringify({ error: 'Failed to update the product' }),
+                {
+                    headers: { 'Content-Type': 'application/json' },
+                    status: 500,
+                }
+            );
+        }
     } catch (error) {
-        console.error("Error updating product: ", error);
+        console.error("Error updating product:", error);
         return new Response(
-            JSON.stringify({error: 'Internal Server Error'}),
+            JSON.stringify({ error: 'Internal Server Error' }),
             {
-                headers: {'Content-Type': 'application/json'},
+                headers: { 'Content-Type': 'application/json' },
                 status: 500,
             }
         );
     }
 }
+
+
 

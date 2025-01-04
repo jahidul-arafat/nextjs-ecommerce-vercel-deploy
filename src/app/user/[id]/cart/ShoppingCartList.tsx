@@ -1,7 +1,3 @@
-// server-side component
-// server-side rendering
-// no hooks are used
-
 import React from "react";
 import { Product } from "@/app/data/product-data";
 import Link from "next/link";
@@ -31,7 +27,10 @@ const renderCartItems = (cartProducts: Product[], onDelete: (id: string) => void
                 </div>
             </Link>
             <button
-                onClick={() => onDelete(product.id)}
+                onClick={(e) => {
+                    e.preventDefault(); // Prevent page reload on button click
+                    onDelete(product.id);
+                }}
                 className="ml-4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
             >
                 Delete
@@ -40,17 +39,17 @@ const renderCartItems = (cartProducts: Product[], onDelete: (id: string) => void
     ));
 };
 
-const ShoppingCartList = ({cartProducts, totalPrice, deleteProduct, userId}: {
-    cartProducts: Product[],
-    totalPrice: number,
-    deleteProduct: (id: string) => void,
-    userId: string
+const ShoppingCartList = ({ cartProducts, totalPrice, deleteProduct, userId }: {
+    cartProducts: Product[];
+    totalPrice: number;
+    deleteProduct: (id: string) => void;
+    userId: string;
 }) => {
-    // Calculate total price here to ensure it's always up-to-date
+    // Calculate total price dynamically based on the current cart state
     const calculatedTotalPrice = cartProducts.reduce((total, product) =>
         total + (typeof product.price === 'number' && !isNaN(product.price) ? product.price : 0), 0);
 
-    console.log('Cart Products:', cartProducts); // Add this line for debugging
+    console.log('Cart Products Rendered: ', cartProducts); // Debugging log
 
     return (
         <div className="container mx-auto px-4 py-8">

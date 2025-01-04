@@ -14,6 +14,28 @@ function ProductItem({ product, index, updateCartCount}: { product: Product; ind
     const [isInCart, setIsInCart] = useState(false);
     const {user} = useUser(); // using the user context, a central context to tag the user status
 
+    // useEffect(() => {
+    //     async function checkCartStatus() {
+    //         if (!user) {
+    //             setIsInCart(false);
+    //             return;
+    //         }
+    //         try {
+    //             const response = await fetch(`/api/user/${user}/cart`);
+    //             if (!response.ok) {
+    //                 console.error('Failed to fetch cart items');
+    //                 return;
+    //             }
+    //             const cartItems: Product[] = await response.json();
+    //             setIsInCart(cartItems.some(item => item.id === product.id));
+    //         } catch (error) {
+    //             console.error('Error checking if product is in cart:', error);
+    //             setIsInCart(false);
+    //         }
+    //     }
+    //
+    //     checkCartStatus();
+    // }, [product.id, user]);
     useEffect(() => {
         async function checkCartStatus() {
             if (!user) {
@@ -26,7 +48,8 @@ function ProductItem({ product, index, updateCartCount}: { product: Product; ind
                     console.error('Failed to fetch cart items');
                     return;
                 }
-                const cartItems: Product[] = await response.json();
+                const data = await response.json();
+                const cartItems: Product[] = data.cartItems || [];
                 setIsInCart(cartItems.some(item => item.id === product.id));
             } catch (error) {
                 console.error('Error checking if product is in cart:', error);
@@ -36,6 +59,7 @@ function ProductItem({ product, index, updateCartCount}: { product: Product; ind
 
         checkCartStatus();
     }, [product.id, user]);
+
 
     const handleAddToCart = async () => {
         if (!user) {
@@ -224,15 +248,18 @@ export default function ProductsList({products}: { products: Product[] }) {
         try {
             const response = await fetch(`/api/user/${user}/cart`);
             if (response.ok) {
-                const cartItems = await response.json();
-                setCartCount(cartItems.length);
+                const data = await response.json();
+                console.log("API Response:", data);
+
+                const validCartProducts = data.cartItems || [];
+                console.log("Valid cart items:", validCartProducts);
+                //const cartItems = await response.json();
+                setCartCount(validCartProducts.length);
             }
         } catch (error) {
             console.error('Error fetching cart count:', error);
         }
     };
-
-
 
 
     // useEffect(() => {
@@ -248,7 +275,7 @@ export default function ProductsList({products}: { products: Product[] }) {
 
     useEffect(() => {
         fetchCartCount();
-    }, [user]);
+    }, [user,cartCount]);
 
     const handleFilterChange = (category, value) => {
         if (category === 'price') {

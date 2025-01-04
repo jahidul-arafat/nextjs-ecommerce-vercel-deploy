@@ -88,46 +88,103 @@ export function addToFavorite(product: Product) {
 
 // Function to delete a product from the user's cart
 export async function deleteProductFromCart(userId: string, productId: string) {
-    // Delete the product
-    const deleteResponse = await fetch(`/api/user/${userId}/cart`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ productIds: [productId] }),
-    });
+    try {
+        // Delete the product from the cart
+        const deleteResponse = await fetch(`/api/user/${userId}/cart`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ productIds: [productId] }),
+        });
 
-    if (!deleteResponse.ok) {
-        throw new Error('Failed to delete product');
-    }
-
-    // Fetch the updated cart
-    const cartResponse = await fetch(`/api/user/${userId}/cart`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        cache: 'no-store', // Ensure we're getting the latest data
-    });
-
-    if (!cartResponse.ok) {
-        throw new Error('Failed to fetch updated cart');
-    }
-
-    const updatedCart = await cartResponse.json();
-
-    // Fetch full details for each product in the cart
-    const fullUpdatedCart = await Promise.all(updatedCart.map(async (item: Product) => {
-        const productResponse = await fetch(`/api/products/${item.id}`);
-        if (productResponse.ok) {
-            return await productResponse.json();
+        if (!deleteResponse.ok) {
+            throw new Error('Failed to delete product');
         }
-        return item; // If fetch fails, keep the original item
-    }));
 
-    console.log("Full updated cart:", fullUpdatedCart);
-    return { updatedCart: fullUpdatedCart };
+        // Fetch the updated cart
+        const cartResponse = await fetch(`/api/user/${userId}/cart`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            cache: 'no-store', // Ensure the latest data is fetched
+        });
+
+        if (!cartResponse.ok) {
+            throw new Error('Failed to fetch updated cart');
+        }
+
+        const { cartItems } = await cartResponse.json(); // Assuming API returns `cartItems`
+
+        if (!Array.isArray(cartItems)) {
+            throw new Error('Invalid cart data received');
+        }
+
+        // Fetch full details for each product in the cart
+        const fullUpdatedCart = await Promise.all(
+            cartItems.map(async (productId: string) => {
+                const productResponse = await fetch(`/api/products/${productId}`);
+                if (productResponse.ok) {
+                    return await productResponse.json();
+                }
+                console.warn(`Failed to fetch details for product ID: ${productId}`);
+                return null; // Handle missing products gracefully
+            })
+        );
+
+        // Filter out any null entries
+        const validCartProducts = fullUpdatedCart.filter(Boolean);
+
+        console.log('Full updated cart:', validCartProducts);
+        return { updatedCart: validCartProducts };
+    } catch (error) {
+        console.error('Error in deleteProductFromCart:', error);
+        throw error;
+    }
 }
+
+// export async function deleteProductFromCart(userId: string, productId: string) {
+//     // Delete the product
+//     const deleteResponse = await fetch(`/api/user/${userId}/cart`, {
+//         method: 'DELETE',
+//         headers: {
+//             'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({ productIds: [productId] }),
+//     });
+//
+//     if (!deleteResponse.ok) {
+//         throw new Error('Failed to delete product');
+//     }
+//
+//     // Fetch the updated cart
+//     const cartResponse = await fetch(`/api/user/${userId}/cart`, {
+//         method: 'GET',
+//         headers: {
+//             'Content-Type': 'application/json',
+//         },
+//         cache: 'no-store', // Ensure we're getting the latest data
+//     });
+//
+//     if (!cartResponse.ok) {
+//         throw new Error('Failed to fetch updated cart');
+//     }
+//
+//     const updatedCart = await cartResponse.json();
+//
+//     // Fetch full details for each product in the cart
+//     const fullUpdatedCart = await Promise.all(updatedCart.map(async (item: Product) => {
+//         const productResponse = await fetch(`/api/products/${item.id}`);
+//         if (productResponse.ok) {
+//             return await productResponse.json();
+//         }
+//         return item; // If fetch fails, keep the original item
+//     }));
+//
+//     console.log("Full updated cart:", fullUpdatedCart);
+//     return { updatedCart: fullUpdatedCart };
+// }
 
 
 // export async function deleteProductFromCart(userId: string, productId: string): Promise<Product[]> {
