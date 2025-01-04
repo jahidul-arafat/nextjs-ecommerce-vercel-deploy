@@ -220,3 +220,15 @@ export async function deleteProductFromCart(userId: string, productId: string) {
 //         throw error;
 //     }
 // }
+
+import { logEvent } from "@/app/componenets/EventLogger";
+
+
+export function traceStateChange(component: string, stateName: string, newValue: any) {
+    logEvent({
+        timestamp: Date.now(),
+        eventType: "stateChange",
+        component,
+        details: { stateName, newValue },
+    });
+}

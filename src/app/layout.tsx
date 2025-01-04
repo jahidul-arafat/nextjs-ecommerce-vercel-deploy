@@ -72,11 +72,11 @@
 
 // Verison 1.3
 
-import { UserProvider } from './UserContext'
+import { UserProvider } from './componenets/UserContext'
 import NavBar from './NavBar'
 import './globals.css'
 import { Inter } from 'next/font/google'
-import RightSidebar from './RightSidebar'
+import RightSidebar from './componenets/RightSidebar'
 
 const inter = Inter({ subsets: ['latin'] })
 

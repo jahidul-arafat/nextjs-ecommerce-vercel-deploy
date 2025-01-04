@@ -5,7 +5,7 @@ import Link from "next/link";
 import {Product} from "@/app/data/product-data";
 import NotFoundPage from "@/app/not-found";
 import {addToCart, addToFavorite} from "@/app/utils/utils";
-import {useUser} from "@/app/UserContext";
+import {useUser} from "@/app/componenets/UserContext";
 
 export const dynamic='force-dynamic';
 

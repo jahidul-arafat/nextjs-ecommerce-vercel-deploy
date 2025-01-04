@@ -6,7 +6,7 @@ import {Product} from "@/app/data/product-data";
 import {useEffect, useState} from "react"; // importing the interface Product{}
 import {FaHeart, FaShoppingCart} from 'react-icons/fa';
 import {addToCart, addToFavorite, deleteProductFromCart} from "@/app/utils/utils"; // Import icons
-import {useUser} from "@/app/UserContext";
+import {useUser} from "@/app/componenets/UserContext";
 
 // render a single product
 // create a simple product list component

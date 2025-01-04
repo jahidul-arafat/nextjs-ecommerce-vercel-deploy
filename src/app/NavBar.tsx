@@ -27,7 +27,7 @@
 import Link from "next/link";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import {useUser} from './UserContext';
+import {useUser} from './componenets/UserContext';
 
 function NavBar() {
     //const [user, setUser] = useState<string | null>(null);
