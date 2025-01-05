@@ -1,5 +1,5 @@
 import {NextRequest, NextResponse} from "next/server";
-import {Product, products} from "@/app/data/product-data";
+import {Product, products} from "@/app/lib/product-data";
 
 // The code is trying to use localStorage, which is not available in a server-side environment like a Next.js API route.
 // localStorage is a browser-specific API and cannot be accessed on the server.

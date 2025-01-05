@@ -31,7 +31,7 @@ function renderNotFoundContent(notFoundType:'route'|'product'|null){
                         : "The page you are looking for doesn't exist or has been moved."
                     }
                 </p>
-                <Link href="/" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300">
+                <Link href="/public" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300">
                     Go back to Home
                 </Link>
             </div>

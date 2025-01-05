@@ -2,9 +2,9 @@
 
 import React, {useEffect, useState} from "react";
 import Link from "next/link";
-import {Product} from "@/app/data/product-data";
-import NotFoundPage from "@/app/not-found";
-import {addToCart, addToFavorite} from "@/app/utils/utils";
+import {Product} from "@/app/lib/product-data";
+import NotFoundPage from "@/app/ui/not-found";
+import {addToCart, addToFavorite} from "@/app/lib/utils";
 // import { fetchAllProducts } from "@/app/utils/utils";
 
 export const dynamic='force-dynamic';

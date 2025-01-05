@@ -2,8 +2,8 @@
 
 import React, {useEffect, useState} from "react";
 import Link from "next/link";
-import {Product} from "@/app/data/product-data";
-import NotFoundPage from "@/app/not-found";
+import {Product} from "@/app/lib/product-data";
+import NotFoundPage from "@/app/ui/not-found";
 // import { fetchAllProducts } from "@/app/utils/utils";
 
 // this is an individual product details page component

@@ -1,5 +1,5 @@
 //import {Product, products} from "@/app/data/product-data";
-import {Product} from "@/app/data/product-data";
+import {Product} from "@/app/lib/product-data";
 import {connectToDb} from "@/app/api/db";
 // Define function for different HTTP methods
 // This will not send back to cleint any react component, instead data just like API

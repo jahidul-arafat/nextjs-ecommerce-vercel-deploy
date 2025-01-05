@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Order } from "@/app/datastucture/order";
+import { Order } from "@/app/lib/order";
 
 // Mock database for orders
 let mockOrders: { [userId: string]: Order[] } = {};

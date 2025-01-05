@@ -3,7 +3,7 @@
 // Import necessary dependencies
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Product, products } from "@/app/data/product-data";
+import { Product, products } from "@/app/lib/product-data";
 import {useRouter} from "next/navigation";
 
 // Define the FavoritePage component

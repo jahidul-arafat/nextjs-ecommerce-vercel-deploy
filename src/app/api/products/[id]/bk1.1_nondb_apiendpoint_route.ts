@@ -1,6 +1,6 @@
 // create a GET method for localhost:3000/api/products/123
 import {NextRequest} from "next/server";
-import {products} from "@/app/data/product-data";
+import {products} from "@/app/lib/product-data";
 
 type Params = {
     id: string

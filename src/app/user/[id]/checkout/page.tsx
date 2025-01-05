@@ -2,11 +2,11 @@
 
 import React, {useState, useEffect} from 'react';
 import {useRouter, useSearchParams} from 'next/navigation';
-import {Product} from "@/app/data/product-data";
+import {Product} from "@/app/lib/product-data";
 import Link from 'next/link';
-import {fetchAllProducts} from "@/app/utils/utils";
-import {Order, OrderItem} from "@/app/datastucture/order";
-import CheckoutInteractionMap from '@/app/utils/CheckoutInteractionMap';
+import {fetchAllProducts} from "@/app/lib/utils";
+import {Order, OrderItem} from "@/app/lib/order";
+import CheckoutInteractionMap from '@/app/lib/CheckoutInteractionMap';
 
 export const dynamic = 'force-dynamic';
 

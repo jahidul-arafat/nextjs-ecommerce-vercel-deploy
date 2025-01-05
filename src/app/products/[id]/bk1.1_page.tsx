@@ -1,11 +1,11 @@
 // localhost:3000/products/<product-id>
 'use client'
 
-import {Product} from "@/app/data/product-data";
-import NotFoundPage from "@/app/not-found";
+import {Product} from "@/app/lib/product-data";
+import NotFoundPage from "@/app/ui/not-found";
 import Link from "next/link";
 import React, {useEffect, useState} from "react";
-import {fetchAllProducts} from "@/app/utils/utils";
+import {fetchAllProducts} from "@/app/lib/utils";
 
 // function renderOneProductDetails(product: TypeOfProduct, addToCart:typeOfAddToCart)
 function renderOneProductDetails(product: Product, addToCartOrFavorite: (type: string) => void) {

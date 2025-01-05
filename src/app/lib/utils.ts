@@ -1,4 +1,4 @@
-import {Product} from "@/app/data/product-data";
+import {Product} from "@/app/lib/product-data";
 
 export async function fetchAllProducts() {
     try {
@@ -221,7 +221,7 @@ export async function deleteProductFromCart(userId: string, productId: string) {
 //     }
 // }
 
-import { logEvent } from "@/app/componenets/EventLogger";
+import { logEvent } from "@/app/lib/EventLogger";
 
 
 export function traceStateChange(component: string, stateName: string, newValue: any) {

@@ -3,8 +3,8 @@
 import React, {useEffect, useState} from 'react';
 import {useRouter} from 'next/navigation';
 import ShoppingCartList from './ShoppingCartList';
-import {Product} from "@/app/data/product-data";
-import {deleteProductFromCart} from "@/app/utils/utils";
+import {Product} from "@/app/lib/product-data";
+import {deleteProductFromCart} from "@/app/lib/utils";
 
 const ClientCartWrapper = ({initialCartProducts, userId}: { initialCartProducts: Product[], userId: string }) => {
     const [cartProducts, setCartProducts] = useState<Product[]>(initialCartProducts);

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {logEvent} from "@/app/componenets/EventLogger";
+import {logEvent} from "@/app/lib/EventLogger";
 
 export function useLoggedState<T>(initialValue: T, component: string, stateName: string) {
     const [state, setState] = useState(initialValue);

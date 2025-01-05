@@ -1,6 +1,6 @@
 // server-side component
 import React from "react";
-import {Product} from "@/app/data/product-data";
+import {Product} from "@/app/lib/product-data";
 import ClientCartWrapper from "@/app/user/[id]/cart/ClientCartWrapper";
 
 export const dynamic='force-dynamic';

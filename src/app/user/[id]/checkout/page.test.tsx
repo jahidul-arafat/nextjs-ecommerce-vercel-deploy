@@ -11,7 +11,7 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Mock the fetchAllProducts function
-jest.mock('../../../utils/utils', () => ({
+jest.mock('../../../lib/utils', () => ({
     fetchAllProducts: jest.fn(),
 }));
 
@@ -37,7 +37,7 @@ describe('CheckoutPage', () => {
             { id: '2', name: 'Product 2', price: 20 },
             { id: '3', name: 'Product 3', price: 30 },
         ];
-        (require('../../../utils/utils').fetchAllProducts as jest.Mock).mockResolvedValue(mockProducts);
+        (require('../../../lib/utils').fetchAllProducts as jest.Mock).mockResolvedValue(mockProducts);
 
         render(<CheckoutPage params={Promise.resolve({ id: 'user1' })} />);
 
@@ -54,7 +54,7 @@ describe('CheckoutPage', () => {
             { id: '2', name: 'Product 2', price: 20 },
             { id: '3', name: 'Product 3', price: 30 },
         ];
-        (require('../../../utils/utils').fetchAllProducts as jest.Mock).mockResolvedValue(mockProducts);
+        (require('../../../lib/utils').fetchAllProducts as jest.Mock).mockResolvedValue(mockProducts);
 
         render(<CheckoutPage params={Promise.resolve({ id: 'user1' })} />);
 
@@ -67,7 +67,7 @@ describe('CheckoutPage', () => {
         const mockProducts = [
             { id: '1', name: 'Product 1', price: 10 },
         ];
-        (require('../../../utils/utils').fetchAllProducts as jest.Mock).mockResolvedValue(mockProducts);
+        (require('../../../lib/utils').fetchAllProducts as jest.Mock).mockResolvedValue(mockProducts);
         (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: true });
 
         render(<CheckoutPage params={Promise.resolve({ id: 'user1' })} />);
@@ -95,7 +95,7 @@ describe('CheckoutPage', () => {
 
     it('handles payment failure', async () => {
         const mockProducts = [{ id: '1', name: 'Product 1', price: 10 }];
-        (require('../../../utils/utils').fetchAllProducts as jest.Mock).mockResolvedValue(mockProducts);
+        (require('../../../lib/utils').fetchAllProducts as jest.Mock).mockResolvedValue(mockProducts);
         (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Payment failed'));
 
         render(<CheckoutPage params={Promise.resolve({ id: 'user1' })} />);
@@ -117,7 +117,7 @@ describe('CheckoutPage', () => {
             { id: '1', name: 'Product 1', price: 10 },
             { id: '2', name: 'Product 2', price: 20 },
         ];
-        (require('../../../utils/utils').fetchAllProducts as jest.Mock).mockResolvedValue(mockProducts);
+        (require('../../../lib/utils').fetchAllProducts as jest.Mock).mockResolvedValue(mockProducts);
 
         render(<CheckoutPage params={Promise.resolve({ id: 'user1' })} />);
 
@@ -129,7 +129,7 @@ describe('CheckoutPage', () => {
 
     it('updates interaction data on mount and unmount', async () => {
         const mockProducts = [{ id: '1', name: 'Product 1', price: 10 }];
-        (require('../../../utils/utils').fetchAllProducts as jest.Mock).mockResolvedValue(mockProducts);
+        (require('../../../lib/utils').fetchAllProducts as jest.Mock).mockResolvedValue(mockProducts);
 
         const { unmount } = render(<CheckoutPage params={Promise.resolve({ id: 'user1' })} />);
 
@@ -144,7 +144,7 @@ describe('CheckoutPage', () => {
 
     it('starts countdown after successful payment', async () => {
         const mockProducts = [{ id: '1', name: 'Product 1', price: 10 }];
-        (require('../../../utils/utils').fetchAllProducts as jest.Mock).mockResolvedValue(mockProducts);
+        (require('../../../lib/utils').fetchAllProducts as jest.Mock).mockResolvedValue(mockProducts);
         (global.fetch as jest.Mock).mockResolvedValue({ ok: true });
 
         jest.useFakeTimers();

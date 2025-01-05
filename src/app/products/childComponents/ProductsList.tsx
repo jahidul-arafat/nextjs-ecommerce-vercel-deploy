@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import {Product} from "@/app/data/product-data";
+import {Product} from "@/app/lib/product-data";
 import {useEffect, useState} from "react"; // importing the interface Product{}
 import {FaHeart, FaShoppingCart} from 'react-icons/fa';
-import {addToCart, addToFavorite, deleteProductFromCart} from "@/app/utils/utils"; // Import icons
-import {useUser} from "@/app/componenets/UserContext";
+import {addToCart, addToFavorite, deleteProductFromCart} from "@/app/lib/utils"; // Import icons
+import {useUser} from "@/app/lib/UserContext";
 
 // render a single product
 // create a simple product list component

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { Order } from '@/app/datastucture/order';
+import { Order } from '@/app/lib/order';
 
 export default function UserOrdersPage({ params }: { params: Promise<{ id: string }> }) {
     const [orders, setOrders] = useState<Order[]>([]);

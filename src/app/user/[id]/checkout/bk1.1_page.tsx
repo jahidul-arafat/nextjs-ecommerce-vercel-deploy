@@ -2,9 +2,9 @@
 
 import React, {useState, useEffect} from 'react';
 import {useRouter, useSearchParams} from 'next/navigation';
-import {Product} from "@/app/data/product-data";
+import {Product} from "@/app/lib/product-data";
 import Link from 'next/link';
-import {fetchAllProducts} from "@/app/utils/utils";
+import {fetchAllProducts} from "@/app/lib/utils";
 
 export const dynamic='force-dynamic';
 

@@ -2,7 +2,7 @@
 "use client"
 
 import React, {useEffect, useState} from "react";
-import { Product } from "@/app/data/product-data";
+import { Product } from "@/app/lib/product-data";
 import Link from "next/link";
 import Image from "next/image";
 import {useRouter} from "next/navigation";

@@ -28,9 +28,9 @@
 
 // Component to display the product page
 import ProductsList from "@/app/products/childComponents/ProductsList";
-import {Product} from "@/app/data/product-data";
+import {Product} from "@/app/lib/product-data";
 import Link from "next/link";
-import {fetchAllProducts} from "@/app/utils/utils";
+import {fetchAllProducts} from "@/app/lib/utils";
 
 export const dynamic='force-dynamic';
 
