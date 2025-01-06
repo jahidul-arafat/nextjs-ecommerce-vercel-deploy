@@ -75,10 +75,8 @@
 import { UserProvider } from './lib/UserContext'
 import NavBar from './ui/NavBar'
 import './ui/globals.css'
-import { Inter } from 'next/font/google'
+import { inter } from '@/app/ui/fonts'
 import RightSidebar from './lib/RightSidebar'
-
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
     title: 'Create Next App',
@@ -92,15 +90,15 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-        <body className={inter.className}>
+        <body className={`${inter.className} antialiased`}>
         <UserProvider>
             <div className="flex flex-col min-h-screen">
-                <NavBar />
+                <NavBar/>
                 <div className="flex flex-1">
                     <main className="w-3/4 p-4 overflow-auto">
                         {children}
                     </main>
-                    <RightSidebar />
+                    <RightSidebar/>
                 </div>
             </div>
         </UserProvider>

@@ -35,7 +35,7 @@ function NavBar() {
     const [showDropdown, setShowDropdown] = useState(false);
     const router = useRouter();
 
-    // archtiecture
+    // architecture
     const [showArchitectureMenu, setShowArchitectureMenu] = useState(false);
     const [expandedCategory, setExpandedCategory] = useState('');
 
